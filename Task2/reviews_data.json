@@ -1,0 +1,68 @@
+{
+  "reviews": [
+    {
+      "id": "1764947790421",
+      "timestamp": "2025-12-05T20:46:30.421974",
+      "rating": 5,
+      "review": "The food was absolutely incredible! The butter chicken was perfectly spiced and the naan bread was fresh and fluffy. Our server was attentive and made excellent recommendations. The ambiance was cozy and romantic. We'll definitely be back for our anniversary!",
+      "user_response": "Thank you so much for the wonderful 5-star review! We're thrilled you enjoyed the butter chicken, naan, attentive service, and romantic ambiance \u2013 it sounds like a perfect experience. We look forward to welcoming you back for your anniversary!",
+      "sentiment": "positive",
+      "summary": "A delighted customer praised the excellent food, attentive service, and romantic ambiance, vowing to return.",
+      "actions": [
+        "Share the positive feedback with the kitchen staff, especially the cook responsible for the butter chicken and naan.",
+        "Recognize and reward the server for their attentiveness and excellent recommendations.",
+        "Ensure the restaurant maintains the cozy and romantic ambiance that customers appreciate."
+      ],
+      "priority": "High",
+      "category": "Overall"
+    },
+    {
+      "id": "1764947853715",
+      "timestamp": "2025-12-05T20:47:33.715025",
+      "rating": 3,
+      "review": "Really enjoyed our visit. The pasta was delicious and the portions were generous. Service was friendly and quick. Only minor complaint is that it was a bit noisy during peak hours, but that's understandable. Great value for money overall.",
+      "user_response": "Thank you for your feedback! We're delighted you enjoyed the pasta, portions, and friendly service; we understand it can get a little noisy during peak hours and appreciate your understanding. We hope to see you again soon!",
+      "sentiment": "positive",
+      "summary": "The customer had a positive experience with delicious food, generous portions, and friendly service, but noted noise levels during peak hours.",
+      "actions": [
+        "Investigate potential solutions to mitigate noise levels during peak hours (e.g., sound dampening materials, table arrangement adjustments).",
+        "Reinforce positive service attributes with staff, emphasizing speed and friendliness.",
+        "Continue to monitor and maintain portion sizes and food quality to ensure continued value for money."
+      ],
+      "priority": "Medium",
+      "category": "Ambiance"
+    },
+    {
+      "id": "1764947915509",
+      "timestamp": "2025-12-05T20:48:35.509390",
+      "rating": 1,
+      "review": "Extremely disappointed. We waited 45 minutes for our food and when it finally arrived, it was cold. The server forgot our drinks twice and seemed disinterested. The chicken was dry and overcooked. For the price we paid, this was completely unacceptable. Will not be returning.",
+      "user_response": "I sincerely apologize that your experience fell so short of expectations. We appreciate your feedback regarding the long wait time, cold food, forgotten drinks, and the quality of the chicken, and I want to assure you that we will address these issues with our team to ensure improvements are made; please contact me directly so we can discuss how to make things right.",
+      "sentiment": "positive",
+      "summary": "The customer experienced extremely poor service and cold, poorly prepared food after a long wait, leading to significant dissatisfaction.",
+      "actions": [
+        "Investigate kitchen procedures to identify bottlenecks causing excessive wait times and quality issues leading to cold and overcooked food.",
+        "Retrain the server on attentive service, including prompt drink orders and consistent engagement with customers.",
+        "Offer the customer a sincere apology and a significant discount or complimentary meal to encourage them to reconsider returning."
+      ],
+      "priority": "High",
+      "category": "Service/Food"
+    },
+    {
+      "id": "1764954239122",
+      "timestamp": "2025-12-05T22:33:59.122017",
+      "rating": 3,
+      "review": "Average experience. Some dishes were good, others were just okay. The appetizer was excellent but the main course was underwhelming. Service was friendly but forgetful. Prices are reasonable. It's not bad, but there are better options in the area.",
+      "user_response": "Thank you for your feedback! We appreciate you highlighting both the positives, like our appetizer and friendly service, and areas where we can improve, such as the main course and attentiveness; we'll share this with our team to ensure a more consistent experience. We hope you'll consider giving us another try in the future to see those improvements.",
+      "sentiment": "neutral",
+      "summary": "Overall experience was average, with highlights in the appetizer and service friendliness, but weaknesses in main courses and service attentiveness, suggesting need for improvement to compete effectively.",
+      "actions": [
+        "Investigate the main course quality issues to identify and rectify the causes for being underwhelming.",
+        "Implement a system for service staff to improve attentiveness and reduce forgetfulness, such as utilizing table-side order confirmation or digital order management.",
+        "Analyze competitor offerings and pricing strategies to ensure a competitive edge based on perceived value and quality."
+      ],
+      "priority": "High",
+      "category": "Food/Service"
+    }
+  ]
+}
