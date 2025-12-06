@@ -361,23 +361,52 @@
 
 
 
+
+
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
-from streamlit_gsheets import GSheetsConnection
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="Admin Dashboard", page_icon="📊", layout="wide")
 
-@st.cache_resource
-def get_connection():
-    return st.connection("gsheets", type=GSheetsConnection)
+def get_gsheet_client():
+    try:
+        credentials_dict = {
+            "type": st.secrets["connections"]["gsheets"]["type"],
+            "project_id": st.secrets["connections"]["gsheets"]["project_id"],
+            "private_key_id": st.secrets["connections"]["gsheets"]["private_key_id"],
+            "private_key": st.secrets["connections"]["gsheets"]["private_key"],
+            "client_email": st.secrets["connections"]["gsheets"]["client_email"],
+            "client_id": st.secrets["connections"]["gsheets"]["client_id"],
+            "auth_uri": st.secrets["connections"]["gsheets"]["auth_uri"],
+            "token_uri": st.secrets["connections"]["gsheets"]["token_uri"],
+            "auth_provider_x509_cert_url": st.secrets["connections"]["gsheets"]["auth_provider_x509_cert_url"],
+            "client_x509_cert_url": st.secrets["connections"]["gsheets"]["client_x509_cert_url"]
+        }
+        
+        scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
+        client = gspread.authorize(credentials)
+        
+        spreadsheet_url = st.secrets["connections"]["gsheets"]["spreadsheet"]
+        sheet = client.open_by_url(spreadsheet_url).sheet1
+        
+        return sheet
+    except Exception as e:
+        st.error(f"Connection error: {str(e)}")
+        return None
 
 def load_reviews():
     try:
-        conn = get_connection()
-        df = conn.read(worksheet="Sheet1", ttl=0)  # ttl=0 means no cache, always fresh
-        return df
+        sheet = get_gsheet_client()
+        if sheet:
+            data = sheet.get_all_records()
+            return pd.DataFrame(data)
+        return pd.DataFrame()
     except:
         return pd.DataFrame()
 
@@ -394,7 +423,6 @@ st.title("📊 Admin Dashboard - Customer Feedback")
 col1, col2 = st.columns([1, 5])
 with col1:
     if st.button("🔄 Refresh", type="primary"):
-        st.cache_resource.clear()
         st.rerun()
 with col2:
     st.write(f"⏰ {datetime.now().strftime('%H:%M:%S')}")
@@ -405,8 +433,10 @@ if df.empty or len(df) == 0:
     st.info("📭 No reviews yet! Submit your first review from the User Dashboard.")
     st.stop()
 
-df['timestamp'] = pd.to_datetime(df['timestamp'])
-df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
+if 'timestamp' in df.columns:
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+if 'rating' in df.columns:
+    df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
 
 tab1, tab2, tab3 = st.tabs(["📋 All Submissions", "📈 Analytics", "💡 Insights"])
 
@@ -479,4 +509,4 @@ with tab3:
     st.download_button("📥 Download All Reviews", csv, f"feedback_{datetime.now().strftime('%Y%m%d')}.csv", "text/csv")
 
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Real-time Auto-Sync Dashboard</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: gray;'>Real-time Dashboard</div>", unsafe_allow_html=True)

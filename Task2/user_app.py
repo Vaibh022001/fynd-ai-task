@@ -344,14 +344,14 @@
 
 
 
-
-
 import streamlit as st
 import google.generativeai as genai
 from datetime import datetime
 import os
 import json
-from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="Customer Feedback Portal", page_icon="⭐", layout="centered")
 
@@ -369,42 +369,67 @@ if 'rating' not in st.session_state:
 if 'review_text' not in st.session_state:
     st.session_state.review_text = ""
 
-@st.cache_resource
-def get_connection():
-    """Get Google Sheets connection"""
-    return st.connection("gsheets", type=GSheetsConnection)
+def get_gsheet_client():
+    """Connect to Google Sheets"""
+    try:
+        credentials_dict = {
+            "type": st.secrets["connections"]["gsheets"]["type"],
+            "project_id": st.secrets["connections"]["gsheets"]["project_id"],
+            "private_key_id": st.secrets["connections"]["gsheets"]["private_key_id"],
+            "private_key": st.secrets["connections"]["gsheets"]["private_key"],
+            "client_email": st.secrets["connections"]["gsheets"]["client_email"],
+            "client_id": st.secrets["connections"]["gsheets"]["client_id"],
+            "auth_uri": st.secrets["connections"]["gsheets"]["auth_uri"],
+            "token_uri": st.secrets["connections"]["gsheets"]["token_uri"],
+            "auth_provider_x509_cert_url": st.secrets["connections"]["gsheets"]["auth_provider_x509_cert_url"],
+            "client_x509_cert_url": st.secrets["connections"]["gsheets"]["client_x509_cert_url"]
+        }
+        
+        scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
+        client = gspread.authorize(credentials)
+        
+        spreadsheet_url = st.secrets["connections"]["gsheets"]["spreadsheet"]
+        sheet = client.open_by_url(spreadsheet_url).sheet1
+        
+        return sheet
+    except Exception as e:
+        st.error(f"Connection error: {str(e)}")
+        return None
 
 def load_reviews():
-    """Load all reviews from Google Sheets"""
+    """Load reviews from Google Sheets"""
     try:
-        conn = get_connection()
-        df = conn.read(worksheet="Sheet1")
-        return df
+        sheet = get_gsheet_client()
+        if sheet:
+            data = sheet.get_all_records()
+            return pd.DataFrame(data)
+        return pd.DataFrame()
     except:
-        import pandas as pd
-        return pd.DataFrame(columns=['id','timestamp','rating','review','user_response','sentiment','summary','actions','priority','category'])
+        return pd.DataFrame()
 
 def save_review(review_data):
     """Append review to Google Sheets"""
     try:
-        conn = get_connection()
-        
-        # Load existing data
-        existing_df = load_reviews()
-        
-        # Create new row
-        import pandas as pd
-        new_row = pd.DataFrame([review_data])
-        
-        # Append
-        updated_df = pd.concat([existing_df, new_row], ignore_index=True)
-        
-        # Write back to sheet
-        conn.update(worksheet="Sheet1", data=updated_df)
-        
-        return True
+        sheet = get_gsheet_client()
+        if sheet:
+            row = [
+                review_data['id'],
+                review_data['timestamp'],
+                review_data['rating'],
+                review_data['review'],
+                review_data['user_response'],
+                review_data['sentiment'],
+                review_data['summary'],
+                review_data['actions'],
+                review_data['priority'],
+                review_data['category']
+            ]
+            sheet.append_row(row)
+            return True
+        return False
     except Exception as e:
-        st.error(f"Error saving: {str(e)}")
+        st.error(f"Save error: {str(e)}")
         return False
 
 def generate_ai_response(rating, review_text):
@@ -440,14 +465,13 @@ st.markdown("""
 st.title("⭐ Customer Feedback Portal")
 st.markdown("### Share your experience with us!")
 
-# Load and show stats
 df = load_reviews()
 if len(df) > 0:
     col1, col2 = st.columns(2)
     with col1:
         st.metric("Total Reviews", len(df))
     with col2:
-        avg = df['rating'].mean()
+        avg = df['rating'].mean() if 'rating' in df.columns else 0
         st.metric("Average Rating", f"{avg:.1f} ⭐")
 
 st.markdown("---")
@@ -515,7 +539,6 @@ if submit_clicked:
                 "category": admin_data["category"]
             }
             
-            # AUTOMATIC SAVE TO GOOGLE SHEETS
             if save_review(review_data):
                 st.markdown(f"""
                 <div class="success-box"><h3>✅ Thank you for your feedback!</h3></div>
@@ -525,7 +548,7 @@ if submit_clicked:
                 st.balloons()
                 st.success("📊 Your review has been automatically saved and is now visible in the Admin Dashboard!")
             else:
-                st.error("Failed to save review. Please try again.")
+                st.error("Could not save to Google Sheets. Please check connection.")
     else:
         st.error("⚠️ Please write a review before submitting.")
 
