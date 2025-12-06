@@ -346,20 +346,16 @@
 
 
 
-
-
 import streamlit as st
 import google.generativeai as genai
 from datetime import datetime
 import os
-import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
+import json
+from streamlit_gsheets import GSheetsConnection
 
 st.set_page_config(page_title="Customer Feedback Portal", page_icon="⭐", layout="centered")
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY') or st.secrets.get("GEMINI_API_KEY")
-SHEET_ID = st.secrets.get("SHEET_ID", "")
 
 if not GEMINI_API_KEY:
     st.error("⚠️ GEMINI_API_KEY not found!")
@@ -373,60 +369,44 @@ if 'rating' not in st.session_state:
 if 'review_text' not in st.session_state:
     st.session_state.review_text = ""
 
-def get_sheet():
-    """Connect to Google Sheet"""
+@st.cache_resource
+def get_connection():
+    """Get Google Sheets connection"""
+    return st.connection("gsheets", type=GSheetsConnection)
+
+def load_reviews():
+    """Load all reviews from Google Sheets"""
     try:
-        # Use anonymous connection for public sheets
-        gc = gspread.service_account_from_dict({
-            "type": "service_account",
-            "project_id": "streamlit-public",
-            "private_key_id": "dummy",
-            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7W\n-----END PRIVATE KEY-----\n",
-            "client_email": "streamlit@streamlit-public.iam.gserviceaccount.com",
-            "client_id": "0",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token"
-        })
-        
-        # For public sheets, use simple URL access
-        url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
-        return pd.read_csv(url)
+        conn = get_connection()
+        df = conn.read(worksheet="Sheet1")
+        return df
     except:
+        import pandas as pd
         return pd.DataFrame(columns=['id','timestamp','rating','review','user_response','sentiment','summary','actions','priority','category'])
-def save_to_sheet(review_data):
-    """Save review to Google Sheet"""
+
+def save_review(review_data):
+    """Append review to Google Sheets"""
     try:
-        # Create Google Sheets edit URL
-        sheet_url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit"
+        conn = get_connection()
         
-        # For now, show the data and link to manually add
-        st.success("✅ Review processed successfully!")
-        st.info(f"📊 To see this review in admin dashboard, the data needs to be added to Google Sheets.")
+        # Load existing data
+        existing_df = load_reviews()
         
-        # Show data in expandable section
-        with st.expander("📋 Review Data (Copy this to Google Sheet)"):
-            st.write(f"**ID:** {review_data['id']}")
-            st.write(f"**Timestamp:** {review_data['timestamp']}")
-            st.write(f"**Rating:** {review_data['rating']}")
-            st.write(f"**Review:** {review_data['review']}")
-            st.write(f"**User Response:** {review_data['user_response']}")
-            st.write(f"**Sentiment:** {review_data['sentiment']}")
-            st.write(f"**Summary:** {review_data['summary']}")
-            st.write(f"**Actions:** {review_data['actions']}")
-            st.write(f"**Priority:** {review_data['priority']}")
-            st.write(f"**Category:** {review_data['category']}")
-            
-            # CSV format for easy copy-paste
-            csv_row = f"{review_data['id']},{review_data['timestamp']},{review_data['rating']},{review_data['review']},{review_data['user_response']},{review_data['sentiment']},{review_data['summary']},{review_data['actions']},{review_data['priority']},{review_data['category']}"
-            st.code(csv_row, language="text")
-            
-        st.info(f"🔗 [Open Google Sheet]({sheet_url}) to add this review (paste the row above)")
+        # Create new row
+        import pandas as pd
+        new_row = pd.DataFrame([review_data])
+        
+        # Append
+        updated_df = pd.concat([existing_df, new_row], ignore_index=True)
+        
+        # Write back to sheet
+        conn.update(worksheet="Sheet1", data=updated_df)
         
         return True
     except Exception as e:
-        st.error(f"Error: {str(e)}")
+        st.error(f"Error saving: {str(e)}")
         return False
-    
+
 def generate_ai_response(rating, review_text):
     prompt = f"""Professional customer service response for {rating}-star review: "{review_text}"
 Return ONLY JSON: {{"response": "2-3 sentences", "sentiment": "positive/negative/neutral"}}"""
@@ -434,7 +414,6 @@ Return ONLY JSON: {{"response": "2-3 sentences", "sentiment": "positive/negative
     try:
         response = model.generate_content(prompt)
         text = response.text.strip().replace('```json', '').replace('```', '')
-        import json
         return json.loads(text)
     except:
         return {"response": "Thank you for your feedback!", "sentiment": "neutral"}
@@ -446,10 +425,9 @@ Return ONLY JSON: {{"summary": "brief", "actions": ["1","2","3"], "priority": "H
     try:
         response = model.generate_content(prompt)
         text = response.text.strip().replace('```json', '').replace('```', '')
-        import json
         return json.loads(text)
     except:
-        return {"summary": "Review received", "actions": ["Review","Follow up","Thank customer"], "priority": "Medium", "category": "Other"}
+        return {"summary": "Review received", "actions": ["Review","Follow up","Thank"], "priority": "Medium", "category": "Other"}
 
 st.markdown("""
 <style>
@@ -462,17 +440,15 @@ st.markdown("""
 st.title("⭐ Customer Feedback Portal")
 st.markdown("### Share your experience with us!")
 
-try:
-    df = get_sheet()
-    if len(df) > 0:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Reviews", len(df))
-        with col2:
-            avg = df['rating'].mean() if 'rating' in df.columns else 0
-            st.metric("Average Rating", f"{avg:.1f} ⭐")
-except:
-    pass
+# Load and show stats
+df = load_reviews()
+if len(df) > 0:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Reviews", len(df))
+    with col2:
+        avg = df['rating'].mean()
+        st.metric("Average Rating", f"{avg:.1f} ⭐")
 
 st.markdown("---")
 st.markdown("### 📝 Your Review")
@@ -530,25 +506,28 @@ if submit_clicked:
                 "id": str(int(datetime.now().timestamp() * 1000)),
                 "timestamp": datetime.now().isoformat(),
                 "rating": rating,
-                "review": review_text.replace(',', ';').replace('\n', ' '),
-                "user_response": user_resp["response"].replace(',', ';').replace('\n', ' '),
+                "review": review_text,
+                "user_response": user_resp["response"],
                 "sentiment": user_resp["sentiment"],
-                "summary": admin_data["summary"].replace(',', ';').replace('\n', ' '),
+                "summary": admin_data["summary"],
                 "actions": '|'.join(admin_data["actions"]),
                 "priority": admin_data["priority"],
                 "category": admin_data["category"]
             }
             
-            save_to_sheet(review_data)
-            
-            st.markdown(f"""
-            <div class="success-box"><h3>✅ Thank you for your feedback!</h3></div>
-            <div class="response-box"><h4>💬 Our Response</h4><p>{user_resp["response"]}</p></div>
-            """, unsafe_allow_html=True)
-            
-            st.balloons()
+            # AUTOMATIC SAVE TO GOOGLE SHEETS
+            if save_review(review_data):
+                st.markdown(f"""
+                <div class="success-box"><h3>✅ Thank you for your feedback!</h3></div>
+                <div class="response-box"><h4>💬 Our Response</h4><p>{user_resp["response"]}</p></div>
+                """, unsafe_allow_html=True)
+                
+                st.balloons()
+                st.success("📊 Your review has been automatically saved and is now visible in the Admin Dashboard!")
+            else:
+                st.error("Failed to save review. Please try again.")
     else:
         st.error("⚠️ Please write a review before submitting.")
 
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Fynd AI Assessment - Real-time Sync</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: gray;'>Fynd AI Assessment - Automatic Sync</div>", unsafe_allow_html=True)

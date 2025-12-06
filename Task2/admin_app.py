@@ -361,29 +361,25 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+from streamlit_gsheets import GSheetsConnection
 
 st.set_page_config(page_title="Admin Dashboard", page_icon="📊", layout="wide")
 
-SHEET_ID = st.secrets.get("SHEET_ID", "")
+@st.cache_resource
+def get_connection():
+    return st.connection("gsheets", type=GSheetsConnection)
+
+def load_reviews():
+    try:
+        conn = get_connection()
+        df = conn.read(worksheet="Sheet1", ttl=0)  # ttl=0 means no cache, always fresh
+        return df
+    except:
+        return pd.DataFrame()
 
 st.markdown("""
 <style>
@@ -395,29 +391,22 @@ st.markdown("""
 
 st.title("📊 Admin Dashboard - Customer Feedback")
 
-col1, col2, col3 = st.columns([1, 1, 4])
+col1, col2 = st.columns([1, 5])
 with col1:
-    if st.button("🔄 Refresh Data", type="primary"):
+    if st.button("🔄 Refresh", type="primary"):
+        st.cache_resource.clear()
         st.rerun()
 with col2:
     st.write(f"⏰ {datetime.now().strftime('%H:%M:%S')}")
 
-def get_data():
-    try:
-        url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
-        df = pd.read_csv(url)
-        return df
-    except:
-        return pd.DataFrame()
-
-df = get_data()
+df = load_reviews()
 
 if df.empty or len(df) == 0:
     st.info("📭 No reviews yet! Submit your first review from the User Dashboard.")
-    st.info(f"🔗 Sheet ID: {SHEET_ID}")
     st.stop()
 
 df['timestamp'] = pd.to_datetime(df['timestamp'])
+df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
 
 tab1, tab2, tab3 = st.tabs(["📋 All Submissions", "📈 Analytics", "💡 Insights"])
 
@@ -439,7 +428,7 @@ with tab1:
     st.markdown("---")
     
     for _, row in df.sort_values('timestamp', ascending=False).iterrows():
-        with st.expander(f"⭐ {row['rating']} stars - {row['timestamp'].strftime('%Y-%m-%d %H:%M')} - **{row['category']}**"):
+        with st.expander(f"⭐ {row['rating']} stars - {pd.to_datetime(row['timestamp']).strftime('%Y-%m-%d %H:%M')} - **{row['category']}**"):
             st.write(f"**Customer Review:**")
             st.write(f"> {row['review']}")
             st.write(f"**AI Summary:** {row['summary']}")
@@ -449,7 +438,7 @@ with tab1:
             
             st.write("**Recommended Actions:**")
             if '|' in str(row['actions']):
-                for action in row['actions'].split('|'):
+                for action in str(row['actions']).split('|'):
                     st.write(f"- {action}")
 
 with tab2:
@@ -461,8 +450,7 @@ with tab2:
         fig1 = px.bar(df['rating'].value_counts().sort_index(), title="Rating Distribution")
         st.plotly_chart(fig1, use_container_width=True)
         
-        fig3 = px.pie(df, names='priority', title="Priority Distribution",
-                     color='priority', color_discrete_map={'High':'red','Medium':'yellow','Low':'green'})
+        fig3 = px.pie(df, names='priority', title="Priority Distribution")
         st.plotly_chart(fig3, use_container_width=True)
     
     with col2:
@@ -487,17 +475,8 @@ with tab3:
         poor = len(df[df['rating'] < 3])
         st.warning(f"**Needs Attention (<3★):** {poor} reviews")
     
-    st.markdown("### Export Data")
     csv = df.to_csv(index=False)
-    st.download_button("📥 Download All Reviews (CSV)", csv, f"feedback_{datetime.now().strftime('%Y%m%d')}.csv", "text/csv")
-    
-    st.markdown("### Recent Critical Reviews (≤2 stars)")
-    critical = df[df['rating'] <= 2].sort_values('timestamp', ascending=False).head(3)
-    if len(critical) > 0:
-        for _, row in critical.iterrows():
-            st.error(f"⭐ {row['rating']} | {row['review'][:100]}...")
-    else:
-        st.success("✅ No critical reviews!")
+    st.download_button("📥 Download All Reviews", csv, f"feedback_{datetime.now().strftime('%Y%m%d')}.csv", "text/csv")
 
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Fynd AI Assessment - Real-time Dashboard</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: gray;'>Real-time Auto-Sync Dashboard</div>", unsafe_allow_html=True)
