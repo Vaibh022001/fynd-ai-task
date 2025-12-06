@@ -1,0 +1,4 @@
+approach,accuracy,mae,json_validity_rate,avg_response_time,total_samples
+Approach 1: Zero-Shot,0.74,0.3,96.0,5.472,50
+Approach 2: Few-Shot,0.72,0.3,98.0,6.371,50
+Approach 3: Chain-of-Thought,0.78,0.24,100.0,8.558,50

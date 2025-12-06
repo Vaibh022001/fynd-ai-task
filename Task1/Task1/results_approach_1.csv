@@ -1,0 +1,51 @@
+review_id,actual_stars,predicted_stars,explanation,valid_json,response_time
+0,1,1,"The review describes poor service, long wait times, unappealing ambiance, and dissatisfying food, indicating a very negative experience.",True,5.543614149093628
+1,1,1,"The review describes terrible service, overpriced food, and a generally negative experience, indicating a very low rating.",True,1.4433345794677734
+2,1,1,"The review expresses extreme dissatisfaction with the small size of the wings, overshadowing any positive comments about flavor, leading to a very negative experience.",True,1.1535263061523438
+3,1,1,"The review expresses extreme dissatisfaction with the staff's helpfulness and product availability, indicating a very negative experience.",True,1.3641695976257324
+4,1,1,"The reviewer mentions consistently bad service, kitchen closing issues, overpriced entrees, and explicitly states they won't return, indicating a very negative experience.",True,1.7841265201568604
+5,1,1,"The review describes a negative experience with poor service, subpar dessert quality, and overall disappointment, indicating a very low rating.",True,1.7826781272888184
+6,1,2,"The review describes multiple issues including unsanitary conditions and poor food quality, suggesting a very negative experience.",True,1.0339088439941406
+7,1,2,"The review highlights negative aspects like theft apathy, messy store conditions, and inadequate staffing despite some appreciation for the fashion.",True,1.2662804126739502
+8,1,2,"The review mentions high prices, small portion sizes, stale bread, and only praises the fries, indicating a negative experience overall.",True,1.3181629180908203
+9,1,1,"The review is overwhelmingly negative, citing rude service, being rushed, and issues with the bill, indicating a very poor experience.",True,1.2603778839111328
+10,2,2,"The reviewer explicitly gives it 2 stars and details numerous significant issues like broken appliances, water billing problems, and disorganized staff.",True,48.359745025634766
+11,2,2,"The reviewer explicitly states they would rate it close to a 2.5 and rounds down to 2, citing awkward table arrangement and a poorly made gyro.",True,1.333028793334961
+12,2,2,"The reviewer explicitly disliked the crucial guacamole and salsa, found the rest of the food just okay, and expected better quality given the location, suggesting a low rating.",True,1.2510316371917725
+13,2,1,"The review describes multiple negative experiences, including bland food, poor execution of dishes, long wait times, inconsistent drinks, and management issues, indicating a very unsatisfactory experience.",True,1.3501791954040527
+14,2,2,"The review highlights several negative experiences (fly in salad, hair on pickle, inconsistent sandwich construction, bland wrap) despite some positive aspects, leading to a decision not to return.",True,1.40224027633667
+15,2,2,The reviewer expresses dissatisfaction with the service due to the barista's unavailability and unprofessional behavior.,True,1.1319730281829834
+16,2,2,"Despite praise for the queso and tortillas, the review details numerous issues including subpar food quality, poor service, a bug in the water, and unpleasant odors, leading to a negative overall experience.",True,1.3526043891906738
+17,2,3,"The review is mixed, with several positives balanced by significant negatives regarding the green sauce, beans, and rice, suggesting an average experience.",True,1.2380247116088867
+18,2,3,"Good service and setting are offset by overpriced and overcooked burgers, indicating a middling experience.",True,1.243713140487671
+19,2,2,"The reviewer expressed disappointment with the sesame chicken and stated they wouldn't return, indicating a negative experience.",True,1.692676305770874
+20,3,3,"The review mentions both positive aspects (fresh seafood, enjoyable patio, tasty tea) and negative aspects (mediocre ginger fish, not-so-hot dish, food looked better than it tasted), suggesting a mixed experience that warrants an average rating.",True,1.6688218116760254
+21,3,3,The reviewer wants to give 4 stars but downgrades due to inconsistent bread quality.,True,52.61811137199402
+22,3,3,"The review indicates a neutral experience with polite service but nothing exceptional, suggesting an average rating.",True,1.2367324829101562
+23,3,3,"The review describes a mixed experience with some positives like the patio and fish and chips, but negatives such as poor service and an 'okay' menu, leaning towards a slightly above average rating.",True,1.4457921981811523
+24,3,4,"Despite the bug incident, the manager addressed it well and the reviewer enjoyed the rest of the meal and generally likes the restaurant.",True,1.3526484966278076
+25,3,3,"The reviewer explicitly states they are giving it 3 stars due to past positive experiences and the shop's charm, despite a very negative recent experience with the staff.",True,1.3645646572113037
+26,3,2,"The reviewer expresses disappointment in the location and cupcake quality, stating the cupcakes were 'okay' or 'meh' and vowing not to return, indicating a generally negative experience.",True,1.2605092525482178
+27,3,3,"Despite positive remarks on uniqueness, staff, and location, the reviewer felt hungry and ripped off due to high prices and small portions, suggesting a mixed experience that doesn't warrant a high rating.",True,1.3551955223083496
+28,3,2,"The review describes poor service, a neglected environment, and an unpleasant atmosphere, suggesting a low rating.",True,1.3597514629364014
+29,3,2,"The review describes poor service, disruptive children, and mixed food quality, indicating a negative experience.",True,1.1315984725952148
+30,4,4,"Positive comments about location, atmosphere, food, and drinks are slightly offset by timing issues with service, indicating a good but not perfect experience.",True,1.2431626319885254
+31,4,4,"The reviewer was generally positive, highlighting the good overall experience despite the dry chicken and slow service due to the busy holiday, but explicitly deducted one star.",True,1.3581063747406006
+32,4,4,"The reviewer explicitly states 'Four stars' and mentions 'No negative feedback to report', indicating a positive experience.",True,53.356173515319824
+33,4,4,"The reviewer praises the food and happy hour but points out drawbacks like noise, limited beer selection, and limited activities, indicating a generally positive but not perfect experience.",True,1.4854180812835693
+34,4,4,"The review is overwhelmingly positive about the concept and experience, but loses a star due to an intrusive employee, suggesting a generally favorable experience with a minor flaw.",True,1.5925118923187256
+35,4,4,"Positive comments about food, staff, and menu selection suggest a good experience, with regret only about not trying a specific dish.",True,1.3875603675842285
+36,4,4,"The reviewer praises the food quality, especially the burger, but expresses disappointment about the change in takeout policy, resulting in a slightly lower rating.",True,1.3396036624908447
+37,4,4,"The review highlights ""fantastic"" food and ""spot on"" service despite mentioning a potentially inconvenient bathroom situation and occasional waits, indicating a positive overall experience.",True,1.3457491397857666
+38,4,5,"The review uses highly positive language like ""fantastic!!!"" and ""delicious!"" and directly attributes a desire to move to the area because of the pizza.",True,1.5899569988250732
+39,4,4,"Positive comments about the food outweigh the neutral service experience, suggesting a positive overall impression.",True,1.4524948596954346
+40,5,5,"The reviewer raves about the product being delicious, heavenly, and highly recommends it, indicating a very positive experience.",True,3.142670154571533
+41,5,5,"The reviewer explicitly states they will continue to give the restaurant five stars and praises the food, menu, and ambiance.",True,2.3886916637420654
+42,5,5,"The reviewer expresses consistent high satisfaction with the food, service, and atmosphere, indicating a very positive experience despite acknowledging negative reviews from meat eaters at a vegan restaurant.",True,1.6802051067352295
+43,5,3,"Error: Expecting ',' delimiter: line 3 column 72 (char 99)",False,48.983049392700195
+44,5,5,"The reviewer uses positive language like 'amazing' and 'wonderful' and praises the freshness, suggesting a highly positive experience.",True,1.4921965599060059
+45,5,3,"Error: Expecting ',' delimiter: line 3 column 70 (char 97)",False,1.2640902996063232
+46,5,5,"Enthusiastic language like ""Kick @$$"" and ""The Best"" combined with the ""Wow"" suggest a very positive experience.",True,1.6202268600463867
+47,5,5,"The reviewer expresses strong positive sentiments about the food quality, service, and overall experience, indicating a top rating.",True,1.3628976345062256
+48,5,5,"The overwhelmingly positive language (awesome, fantastic, out of this world, A++, definitely recommend) strongly suggests a 5-star experience.",True,1.2623794078826904
+49,5,5,"The reviewer expresses strong positive sentiment ('SCORE!', 'really cute') and excitement, indicating a likely 5-star rating.",True,1.1496551036834717
