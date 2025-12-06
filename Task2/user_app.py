@@ -393,27 +393,40 @@ def get_sheet():
         return pd.read_csv(url)
     except:
         return pd.DataFrame(columns=['id','timestamp','rating','review','user_response','sentiment','summary','actions','priority','category'])
-
 def save_to_sheet(review_data):
     """Save review to Google Sheet"""
     try:
-        # Read current data
-        url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
-        df = pd.read_csv(url)
+        # Create Google Sheets edit URL
+        sheet_url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit"
         
-        # Append new review
-        new_df = pd.concat([df, pd.DataFrame([review_data])], ignore_index=True)
+        # For now, show the data and link to manually add
+        st.success("✅ Review processed successfully!")
+        st.info(f"📊 To see this review in admin dashboard, the data needs to be added to Google Sheets.")
         
-        # Show success
-        st.success("✅ Review saved successfully!")
-        st.info("🔄 Admin dashboard will show your review in real-time!")
+        # Show data in expandable section
+        with st.expander("📋 Review Data (Copy this to Google Sheet)"):
+            st.write(f"**ID:** {review_data['id']}")
+            st.write(f"**Timestamp:** {review_data['timestamp']}")
+            st.write(f"**Rating:** {review_data['rating']}")
+            st.write(f"**Review:** {review_data['review']}")
+            st.write(f"**User Response:** {review_data['user_response']}")
+            st.write(f"**Sentiment:** {review_data['sentiment']}")
+            st.write(f"**Summary:** {review_data['summary']}")
+            st.write(f"**Actions:** {review_data['actions']}")
+            st.write(f"**Priority:** {review_data['priority']}")
+            st.write(f"**Category:** {review_data['category']}")
+            
+            # CSV format for easy copy-paste
+            csv_row = f"{review_data['id']},{review_data['timestamp']},{review_data['rating']},{review_data['review']},{review_data['user_response']},{review_data['sentiment']},{review_data['summary']},{review_data['actions']},{review_data['priority']},{review_data['category']}"
+            st.code(csv_row, language="text")
+            
+        st.info(f"🔗 [Open Google Sheet]({sheet_url}) to add this review (paste the row above)")
         
         return True
     except Exception as e:
-        st.error(f"Could not save to sheet. Error: {str(e)}")
-        st.info("💡 Make sure the sheet is set to 'Anyone with link can EDIT'")
+        st.error(f"Error: {str(e)}")
         return False
-
+    
 def generate_ai_response(rating, review_text):
     prompt = f"""Professional customer service response for {rating}-star review: "{review_text}"
 Return ONLY JSON: {{"response": "2-3 sentences", "sentiment": "positive/negative/neutral"}}"""
